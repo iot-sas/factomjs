@@ -1,0 +1,6 @@
+{
+    "bootstrap": {
+        "wallet": "test/fds/wallet.json",
+        "scriptjs": "test/fds/bootstrap.js"
+    }
+}
