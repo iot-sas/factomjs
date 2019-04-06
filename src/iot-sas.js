@@ -50,7 +50,7 @@ var com = new SerialPort('/dev/serial0', {
 
 
 //Sign data
-function sign(ecAddress,data,signature)
+function sign(data,signature)
 {
 
 var buffer = new Buffer(5);
@@ -101,7 +101,7 @@ var com = new SerialPort('/dev/serial0', {
 getECAddress(function(ec)
 {
   console.log(ec);
-  sign (ec,Buffer.from("some data theduihwedd iuhwediuhwed", 'utf8'),function(signature)
+  sign (Buffer.from("some data theduihwedd iuhwediuhwed", 'utf8'),function(signature)
   {
     console.log(signature);
   });    
