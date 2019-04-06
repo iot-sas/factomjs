@@ -1,8 +1,9 @@
-const sign = require('tweetnacl/nacl-fast').sign,
+const sign = require('./iot-sas').sign,
     { addressToKey, isValidPrivateEcAddress, isValidPublicEcAddress } = require('./addresses'),
     { Entry } = require('./entry'),
     { sha256, sha256d } = require('./util'),
     { CHAIN_CREATION_COST } = require('./constant');
+
 
 /**********************
  * Chain class
