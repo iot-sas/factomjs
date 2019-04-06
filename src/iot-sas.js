@@ -1,5 +1,4 @@
 
-
 //Get the EC address from the IOT-SAS board
 function getECAddress()
 {
@@ -82,7 +81,6 @@ return new Promise((resolve, reject) => {
             if (result.length >= 64) {
                 if (result.length > 64) result = result.slice(0, 64);
                 com.close();
-                console.log("2");
                 resolve(result);
             }
         });
@@ -98,6 +96,7 @@ return new Promise((resolve, reject) => {
 }
 
 
+//getECAddress().then(console.log);
 //sign(Buffer.from("some test data blah blah qwerqwerqwre", 'utf8')).then(console.log).catch(console.log);
 
 module.exports = { sign, getECAddress}
