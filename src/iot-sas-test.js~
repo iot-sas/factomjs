@@ -71,7 +71,7 @@ async function AddEntry(pubKey)
 async function Test()
 {
   ECPublicKey =  await iot.getECAddress();
-  console.log("PubKey: "+ECPublicKey);
+  console.log(ECPublicKey);
   AddChain(ECPublicKey);
   //AddEntry(ECPublicKey);
 }
