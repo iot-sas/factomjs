@@ -1,4 +1,4 @@
-const sign = require('./iot-sas').sign,
+const sign = require('tweetnacl/nacl-fast').sign,
     { addressToKey, isValidPrivateEcAddress, isValidPublicEcAddress } = require('./addresses'),
     { MAX_ENTRY_PAYLOAD_SIZE } = require('./constant'),
     { sha256, sha512 } = require('./util');
@@ -334,7 +334,7 @@ function marshalExternalIdsBinary(extIds) {
  * @param {string|Buffer} [signature] - Optional signature of the commit (composeEntryLedger). Only necessary if a public EC address was passed as 2nd argument.
  * @returns {Buffer} - Entry commit.
  */
-async function composeEntryCommit(entry, ecAddress, signature) {
+function composeEntryCommit(entry, ecAddress, signature) {
     validateEntryInstance(entry);
 
     const buffer = composeEntryLedger(entry);
@@ -346,9 +346,7 @@ async function composeEntryCommit(entry, ecAddress, signature) {
         const secret = addressToKey(ecAddress);
         const key = sign.keyPair.fromSeed(secret);
         ecPublicKey = Buffer.from(key.publicKey);
-        
-        sig = await sign(buffer)
-        sig = Buffer.from(sig)
+        sig = Buffer.from(sign.detached(buffer, key.secretKey));
     } else if (isValidPublicEcAddress(ecAddress)) {
         // Verify the signature manually provided
         if (!signature) {

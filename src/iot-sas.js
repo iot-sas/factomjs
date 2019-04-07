@@ -1,6 +1,29 @@
 
+class iotsas
+{
+
+
+
+constructor(device = '/dev/serial0') {
+    var SerialPort = require('serialport');
+    this.com = new SerialPort(device, {
+      baudRate: 57600,
+      databits: 8,
+      parity: 'none',
+      autoOpen: false
+    });
+    
+    
+    this.com.open(error => {
+        if (error) {
+            console.log("Error opening port");
+        }
+     });
+
+  }
+
 //Get the EC address from the IOT-SAS board
-function getECAddress()
+getECAddress()
 {
 
 var buffer = new Buffer(7);
@@ -14,35 +37,16 @@ var buffer = new Buffer(7);
 
 
 var result = '';
-
-var SerialPort = require('serialport');
-
-var com = new SerialPort('/dev/serial0', {
-    baudRate: 57600,
-    databits: 8,
-    parity: 'none',
-    autoOpen: false
-});
-
-
-
+//this.com.flush();
+this.com.write(buffer);
 return new Promise((resolve, reject) => {
-        com.on('error', err => reject('Error while sending message : ' + err));
+        this.com.on('error', err => reject('Error while sending message : ' + err));
 
-        com.on('data', chunk => {
+        this.com.on('data', chunk => {
             result += chunk;
             if (result.length >= 52) {
                 if (result.length > 52) result = result.slice(0, 52);
-                com.close();
                 resolve(result);
-            }
-        });
-
-        com.open(error => {
-            if (error) {
-                reject('Error while opening the port ' + error);
-            } else {
-                com.write(buffer);
             }
         });
     });
@@ -50,8 +54,9 @@ return new Promise((resolve, reject) => {
 
 
 //Sign data
-function sign(data)
+sign(data)
 {
+
 
 var buffer = new Buffer(5);
    buffer[0] = 0xfa;
@@ -62,41 +67,30 @@ var buffer = new Buffer(5);
 
 buffer = Buffer.concat([buffer,data]);
 
-var result = '';
+var result = new Buffer(0);
 
-var SerialPort = require('serialport');
-
-var com = new SerialPort('/dev/serial0', {
-    baudRate: 57600,
-    databits: 8,
-    parity: 'none',
-    autoOpen: false
-});
-
+this.com.flush();
+this.com.write(buffer);
 return new Promise((resolve, reject) => {
-        com.on('error', err => reject('Error while sending message : ' + err));
+        this.com.on('error', err => reject('Error while sending message : ' + err));
 
-        com.on('data', chunk => {
-            result += chunk;
+        this.com.on('data', chunk => {
+            result = Buffer.concat([result,chunk]);
             if (result.length >= 64) {
                 if (result.length > 64) result = result.slice(0, 64);
-                com.close();
                 resolve(result);
+                console.log(result);
+                this.com.flush();
             }
-        });
-
-        com.open(error => {
-            if (error) {
-                reject('Error while opening the port ' + error);
-            } else {
-                com.write(buffer);
-            }
-        });
+        }); 
     });
 }
 
+}
 
-//getECAddress().then(console.log);
-//sign(Buffer.from("some test data blah blah qwerqwerqwre", 'utf8')).then(console.log).catch(console.log);
+//let iot = new iotsas();
+//iot.getECAddress().then(console.log);
 
-module.exports = { sign, getECAddress}
+//iot.sign(Buffer.from("some test data blah blah qwerqwerqwre", 'utf8')).then(console.log).catch(console.log);
+
+module.exports = iotsas;
