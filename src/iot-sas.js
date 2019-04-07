@@ -1,3 +1,4 @@
+//IOT-SAS board driver
 
 class iotsas
 {
@@ -42,7 +43,7 @@ return new Promise((resolve, reject) => {
 
         this.com.on('data', chunk => {
             result += chunk;
-            if (result.length >= 52) {
+            if (result.length >= 54) {
                 if (result.length > 52) result = result.slice(0, 52);
                 resolve(result);
             }
@@ -55,8 +56,7 @@ return new Promise((resolve, reject) => {
 sign(data)
 {
 
-
-var buffer = new Buffer(5);
+var buffer = Buffer.alloc(5);
    buffer[0] = 0xfa;
    buffer[1] = 0x02;
    buffer[2] = 0x02;
@@ -65,7 +65,7 @@ var buffer = new Buffer(5);
 
 buffer = Buffer.concat([buffer,data]);
 
-var result = new Buffer(0);
+var result = Buffer.alloc(0);
 
 this.com.flush();
 this.com.write(buffer);
@@ -74,7 +74,7 @@ return new Promise((resolve, reject) => {
 
         this.com.on('data', chunk => {
             result = Buffer.concat([result,chunk]);
-            if (result.length >= 64) {
+            if (result.length >= 66) {
                 if (result.length > 64) result = result.slice(0, 64);
                 resolve(result);
                 this.com.flush();
@@ -84,10 +84,5 @@ return new Promise((resolve, reject) => {
 }
 
 }
-
-//let iot = new iotsas();
-//iot.getECAddress().then(console.log);
-
-//iot.sign(Buffer.from("some test data blah blah qwerqwerqwre", 'utf8')).then(console.log).catch(console.log);
 
 module.exports = iotsas;

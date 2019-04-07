@@ -24,18 +24,18 @@ const cli = new FactomCli({
 });
 
 
-
 //Add a chain
 
 async function AddChain(pubKey)
 {
   const { Entry, Chain ,composeChainLedger, composeChainCommit} = require('./factom');
+
   const chainEntry = Entry.builder()
-    .extId('6d79206578742069642031') // If no encoding parameter is passed as 2nd argument, 'hex' is used
-    .extId('my ext id 1', 'utf8') // Explicit the encoding. Or you can pass directly a Buffer
-    .content('Initial content', 'utf8')
-    .timestamp(Date.now())
-    .build();
+        .extId('6d79206578742069642031')  // If no encoding parameter is passed as 2nd argument, 'hex' is used
+        .extId('my ext id 1', 'utf8')
+        .content('Initial content', 'utf8')
+        .timestamp(Date.now())
+        .build();
 
   const chain = new Chain(chainEntry);
   console.log("ChainID: "+chain.idHex);  
@@ -43,23 +43,22 @@ async function AddChain(pubKey)
   const signature = await iot.sign(dataToSign);
   const commit = composeChainCommit(chain, pubKey, signature);
   await cli.factomdApi('commit-chain', {message: commit.toString('hex')});
-  await cli.reveal(chainEntry); 
+  await cli.reveal(chain); 
 }
 
 
 //Add an Entry
 
-async function AddEntry(pubKey)
+async function AddEntry(pubKey, chainId)
 {
   const { Entry, composeEntryLedger, composeEntryCommit } = require('./factom');
   const myEntry = Entry.builder()
-    .chainId('9107a308f91fd7962fecb321fdadeb37e2ca7d456f1d99d24280136c0afd55f2')
+    .chainId(chainId)
     .extId('6d79206578742069642031') // If no encoding parameter is passed as 2nd argument, 'hex' is used
     .extId('some external ID', 'utf8')
     .content('My new content',  'utf8')
     .timestamp(Date.now())
-    .build();
-    
+    .build();   
     
   const dataToSign = composeEntryLedger(myEntry);
   const signature = await iot.sign(dataToSign);  
@@ -72,8 +71,8 @@ async function Test()
 {
   ECPublicKey =  await iot.getECAddress();
   console.log("PubKey: "+ECPublicKey);
-  AddChain(ECPublicKey);
-  //AddEntry(ECPublicKey);
+  await AddChain(ECPublicKey);
+//  await AddEntry(ECPublicKey, chainId);
 }
 
 Test()
